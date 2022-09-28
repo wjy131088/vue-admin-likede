@@ -1,14 +1,10 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
-      <div class="title-container">
-        <h3 class="title">Login Form</h3>
-      </div>
-
+      <!-- 账号 -->
       <el-form-item prop="username">
         <span class="svg-container">
-          <svg-icon icon-class="user" />
+          <i class="el-icon-mobile" />
         </span>
         <el-input
           ref="username"
@@ -20,10 +16,10 @@
           auto-complete="on"
         />
       </el-form-item>
-
+      <!-- 密码 -->
       <el-form-item prop="password">
         <span class="svg-container">
-          <svg-icon icon-class="password" />
+          <i class="el-icon-lock" />
         </span>
         <el-input
           :key="passwordType"
@@ -40,13 +36,20 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
+      <!-- 验证码 -->
+      <el-form-item>
+        <span class="svg-container">
+          <i class="el-icon-lock" />
+        </span>
+        <el-input v-model="loginForm.code" style="width: 268px;" placeholder="请输入验证码" />
+        <img class="code-img" style="">
+      </el-form-item>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;background:#6579ed">登录</el-button>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;">Login</el-button>
-
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
-      </div>
+      </div> -->
 
     </el-form>
   </div>
@@ -86,6 +89,7 @@ export default {
       redirect: undefined
     }
   },
+
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -133,6 +137,8 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .login-container {
+  background-image: url('~@/assets/common/background.png'); // 设置背景图片
+  background-position: center; // 将图片位置设置为充满整个屏幕
   .el-input {
     display: inline-block;
     height: 47px;
@@ -144,9 +150,9 @@ $cursor: #fff;
       -webkit-appearance: none;
       border-radius: 0px;
       padding: 12px 5px 12px 15px;
-      color: $light_gray;
+      color: #acb1b8;
       height: 47px;
-      caret-color: $cursor;
+      caret-color: #9999b3;
 
       &:-webkit-autofill {
         box-shadow: 0 0 0px 1000px $bg inset !important;
@@ -157,7 +163,9 @@ $cursor: #fff;
 
   .el-form-item {
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
+    // background: rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e2e2;
+    background: $cursor;
     border-radius: 5px;
     color: #454545;
   }
@@ -176,25 +184,33 @@ $light_gray:#eee;
   overflow: hidden;
 
   .login-form {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -194px;
+    margin-left: -259px;
     width: 520px;
+    height: 388px;
     max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
-    overflow: hidden;
+    // margin: 0 auto;
+    // overflow: hidden;
+    padding: 76px 35px 0;
+    background: #fff;
+    box-shadow: 0 3px 70px 0 rgb(30 111 72 / 35%);
+    border-radius: 10px;
   }
 
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
+  // .tips {
+  //   font-size: 14px;
+  //   color: #fff;
+  //   margin-bottom: 10px;
 
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
+  //   span {
+  //     &:first-of-type {
+  //       margin-right: 16px;
+  //     }
+  //   }
+  // }
 
   .svg-container {
     padding: 6px 5px 6px 15px;
@@ -204,17 +220,17 @@ $light_gray:#eee;
     display: inline-block;
   }
 
-  .title-container {
-    position: relative;
+  // .title-container {
+  //   position: relative;
 
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
+  //   .title {
+  //     font-size: 26px;
+  //     color: $light_gray;
+  //     margin: 0px auto 40px auto;
+  //     text-align: center;
+  //     font-weight: bold;
+  //   }
+  // }
 
   .show-pwd {
     position: absolute;
