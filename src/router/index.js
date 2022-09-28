@@ -1,6 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
+import worker from './modules/worker'
+import point from './modules/point'
+import equipment from './modules/equipment'
+import personnel from './modules/personnel'
+import goods from './modules/goods'
+import policy from './modules/policy'
+import order from './modules/order'
+import accounting from './modules/accounting'
 Vue.use(Router)
 
 /* Layout */
@@ -30,6 +37,7 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+const asyncRoutes = [worker, point, equipment, personnel, goods, policy, order, accounting]
 export const constantRoutes = [
   {
     path: '/login',
@@ -62,7 +70,7 @@ export const constantRoutes = [
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
+  routes: [...constantRoutes, ...asyncRoutes]
 })
 
 const router = createRouter()

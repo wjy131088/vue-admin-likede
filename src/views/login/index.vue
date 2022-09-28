@@ -32,16 +32,16 @@
           <i class="el-icon-lock" />
         </span>
         <el-input v-model="loginForm.code" style="width: 268px;" placeholder="请输入验证码" />
-        <img class="code-img" style="">
+        <img :src="codeUrl" class="code-img" style="" @click="getCode">
       </el-form-item>
-      <el-button type="primary" style="width:100%;margin-bottom:30px;background:#6579ed">登录</el-button>
+      <el-button type="primary" style="width:100%;margin-bottom:30px;background:#6579ed" @click="onLogin">登录</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
 // import { validUsername } from '@/utils/validate'
-
+import { getCodeAPI } from '@/api'
 export default {
   name: 'Login',
   data() {
@@ -60,16 +60,46 @@ export default {
           { required: true, message: '密码必填', trigger: 'blur' },
           { min: 5, max: 16, message: '密码格式错误', trigger: 'blur' }
         ]
-      }
+      },
+      codeUrl: '',
+      loading: false
     }
   },
-
+  created() {
+    this.getCode()
+  },
   methods: {
     showPwd() {
       this.passwordType === 'password' ? this.passwordType = '' : this.passwordType = 'password'
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
+    },
+    // 验证码图片
+    async getCode() {
+      const random = Math.random() * (100 - 1) + 1
+      this.loginForm.clientToken = random
+      try {
+        const data = await getCodeAPI(random)
+        this.codeUrl = data.request.responseURL
+        // console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async onLogin() {
+      try {
+        // const res = await this.$refs.loginForm.validate()
+        // await this.$refs.loginForm.validate()
+        // 通过登录接口 把数据提供给后端
+        this.loading = true
+        await this.$store.dispatch('user/loginAction', this.loginForm)
+        this.$router.push({ path: '/dashboard' })
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.loading = true
+      }
     }
   }
 }
@@ -152,6 +182,10 @@ $light_gray:#eee;
     background: #fff;
     box-shadow: 0 3px 70px 0 rgb(30 111 72 / 35%);
     border-radius: 10px;
+    .code-img{
+      float:right;
+      // display: block;
+    }
   }
 
   // .tips {
