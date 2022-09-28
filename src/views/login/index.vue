@@ -1,19 +1,14 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="loginForm" :rules="loginRules" :model="loginForm" class="login-form" auto-complete="on" label-position="left">
       <!-- 账号 -->
-      <el-form-item prop="username">
+      <el-form-item prop="loginName">
         <span class="svg-container">
           <i class="el-icon-mobile" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
+          v-model="loginForm.loginName"
+          placeholder="请输入账号"
         />
       </el-form-item>
       <!-- 密码 -->
@@ -22,99 +17,58 @@
           <i class="el-icon-lock" />
         </span>
         <el-input
-          :key="passwordType"
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
+          placeholder="请输入密码"
         />
-        <span class="show-pwd" @click="showPwd">
+        <span class="svg-container" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
       <!-- 验证码 -->
-      <el-form-item>
+      <el-form-item prop="code">
         <span class="svg-container">
           <i class="el-icon-lock" />
         </span>
         <el-input v-model="loginForm.code" style="width: 268px;" placeholder="请输入验证码" />
         <img class="code-img" style="">
       </el-form-item>
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;background:#6579ed">登录</el-button>
-
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
-
+      <el-button type="primary" style="width:100%;margin-bottom:30px;background:#6579ed">登录</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+// import { validUsername } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        loginName: 'admin',
+        password: 'admin',
+        code: '',
+        clientToken: '',
+        loginType: 0
       },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
-      },
-      loading: false,
       passwordType: 'password',
-      redirect: undefined
+      loginRules: {
+        loginName: [{ required: true, trigger: 'blur', message: '账号必填' }],
+        password: [
+          { required: true, message: '密码必填', trigger: 'blur' },
+          { min: 5, max: 16, message: '密码格式错误', trigger: 'blur' }
+        ]
+      }
     }
   },
 
   methods: {
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
+      this.passwordType === 'password' ? this.passwordType = '' : this.passwordType = 'password'
       this.$nextTick(() => {
         this.$refs.password.focus()
-      })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
       })
     }
   }
