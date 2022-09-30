@@ -3,8 +3,8 @@ export default {
   path: '/worker',
   component: Layout,
   meta: {
-    title: '工单管理'
-    //   icon: 'tree-table'
+    title: '工单管理',
+    icon: 'zhangdan1'
   },
   children: [{
     name: 'worker',

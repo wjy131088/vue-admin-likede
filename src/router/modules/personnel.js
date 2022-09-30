@@ -3,8 +3,8 @@ export default {
   path: '/personnel',
   component: Layout,
   meta: {
-    title: '人员管理'
-    //   icon: 'tree-table'
+    title: '人员管理',
+    icon: 'renyuanguanli'
   },
   children: [{
     name: 'personnel',

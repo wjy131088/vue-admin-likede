@@ -7,8 +7,8 @@ export default {
     path: '',
     component: () => import('@/views/accounting'),
     meta: {
-      title: '对账统计'
-    //   icon: 'tree-table'
+      title: '对账统计',
+      icon: 'zhangdan'
     }
   }]
 }

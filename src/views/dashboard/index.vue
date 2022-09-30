@@ -27,22 +27,6 @@
           <el-col :span="10"><div class="grid-content bg-purple point-img">1</div></el-col>
         </el-row>
       </div>
-      <!-- <div class="top" style="margin-bottom: 15px;background: yellow;">
-        <el-row :gutter="10">
-          <el-col :span="8"><div class="grid-content bg-purple order-statistics">1</div></el-col>
-          <el-col :span="8"><div class="grid-content bg-purple sales-statistics">1</div></el-col>
-          <el-col :span="8"><div class="grid-content bg-purple hot-goods">1</div></el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="16"><div class="grid-content bg-purple Chart" /></el-col>
-        </el-row>
-      </div>
-      <div class="bottom">
-        <el-row :gutter="10">
-          <el-col :span="12"><div class="grid-content bg-purple" /></el-col>
-          <el-col :span="12"><div class="grid-content bg-purple" /></el-col>
-        </el-row>
-      </div> -->
     </div>
   </div>
 </template>

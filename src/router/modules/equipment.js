@@ -3,8 +3,8 @@ export default {
   path: '/equipment',
   component: Layout,
   meta: {
-    title: '设备管理'
-    //   icon: 'tree-table'
+    title: '设备管理',
+    icon: 'shebei'
   },
   children: [{
     name: 'equipment',

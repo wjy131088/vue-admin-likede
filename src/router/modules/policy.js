@@ -7,8 +7,8 @@ export default {
     path: '',
     component: () => import('@/views/policy'),
     meta: {
-      title: '策略管理'
-    //   icon: 'tree-table'
+      title: '策略管理',
+      icon: 'dengpao'
     }
   }]
 }

@@ -3,8 +3,8 @@ export default {
   path: '/goods',
   component: Layout,
   meta: {
-    title: '商品管理'
-    //   icon: 'tree-table'
+    title: '商品管理',
+    icon: 'icon_shangpin'
   },
   children: [{
     name: 'goods',

@@ -7,8 +7,8 @@ export default {
     path: '',
     component: () => import('@/views/order'),
     meta: {
-      title: '订单管理'
-    //   icon: 'tree-table'
+      title: '订单管理',
+      icon: 'zixun'
     }
   }]
 }

@@ -3,8 +3,8 @@ export default {
   path: '/point',
   component: Layout,
   meta: {
-    title: '点位管理'
-    //   icon: 'tree-table'
+    title: '点位管理',
+    icon: 'dingwei'
   },
   children: [{
     name: 'point',
