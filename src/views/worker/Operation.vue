@@ -1,13 +1,17 @@
 <template>
-  <div>Operation</div>
+  <div><List /></div>
 </template>
 
 <script>
+import List from '@/components/List/List.vue'
 export default {
-
+  components: {
+    List
+  }
 }
 </script>
 
 <style>
 
 </style>
+

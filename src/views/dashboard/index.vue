@@ -4,15 +4,21 @@
       <div class="top" style="">
         <div class="top-left">
           <el-row :gutter="10">
-            <el-col :span="12">
-              <div class="grid-content bg-purple order-statistics">1</div>
+            <el-col :span="13">
+              <div class="grid-content bg-purple order-statistics">
+                <!-- =工单统计 -->
+                <order-total-img />
+              </div>
             </el-col>
-            <el-col :span="12">
-              <div class="grid-content bg-purple sales-statistics">1</div>
+            <el-col :span="11">
+              <!-- 销售统计 -->
+              <div class="grid-content bg-purple sales-statistics">
+                <sales-total-img />
+              </div>
             </el-col>
           </el-row>
           <div class="Chart">
-            <el-col :span="24"><div class="grid-content bg-purple chart">1</div></el-col>
+            <Echart />
           </div>
         </div>
         <div class="top-right">
@@ -32,30 +38,33 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
+import OrderTotalImg from './components/OrderTotalImg.vue'
+import SalesTotalImg from './components/SalesTotalImg.vue'
+import Echart from './components/Echart.vue'
 export default {
-  name: 'Dashboard',
-  computed: {
-    ...mapGetters([
-      // 'name'
-    ])
+  components: {
+    OrderTotalImg,
+    SalesTotalImg,
+    Echart
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.dashboard-text{
+  min-width: 1200px !important;
+}
 .dashboard {
   &-container {
-    margin: 10px;
+    // margin: 15px;
     .el-row {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     &:last-child {
       margin-bottom: 0;
     }
   }
   .el-col {
-    border-radius: 10px;
+    border-radius: 15px;
   }
   .bg-purple-dark {
     background: #99a9bf;
@@ -78,28 +87,15 @@ export default {
     display: flex;
     margin-bottom: 10px;
     .top-left{
-      background-color: #ccc;
       margin-right: 10px;
-      flex: 16;
-  //     .top-left-total{
-  //       display: flex;
-  //       .order-statistics{
-  //         width: 460px;
-  //         height: 170px;
-  //       }
-  //     }
-  //     .Chart{}
+      flex: 17;
     }
-    .top-right{flex: 8;}
+    .top-right{flex: 7;}
   }
   &-text {
     font-size: 30px;
     line-height: 46px;
   }
-
-  // .bottom{
-  //   .bottom-left{}
-  //   .bottom-right{}
   .order-statistics{
     height: 166px !important;
   }
