@@ -1,6 +1,6 @@
 import axios from 'axios'
 // import { MessageBox, Message } from 'element-ui'
-// import store from '@/store'
+import store from '@/store'
 // import { getToken } from '@/utils/auth'
 
 // create an axios instance
@@ -9,7 +9,14 @@ const service = axios.create({
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
-
+service.interceptors.request.use(function(config) {
+  // 在发送请求之前做些什么
+  config.headers.Authorization = store.state.user.token
+  return config
+}, function(error) {
+  // 对请求错误做些什么
+  return Promise.reject(error)
+})
 // request interceptor
 // service.interceptors.request.use(
 //   config => {

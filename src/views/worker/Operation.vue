@@ -1,17 +1,215 @@
 <template>
-  <div><List /></div>
+  <div>
+    <!-- 搜索框 -->
+    <div class="search">
+      <!-- <MyInput /> -->
+      <MyInput :input-arr="inputArr" @clickSelect="selectData" />
+    </div>
+    <!-- main -->
+    <div class="operation">
+      <!-- 按钮 -->
+      <el-row class="btn">
+        <el-button size="medium" icon="el-icon-circle-plus-outline" class="newBtn" @click="newTask = true">新建</el-button>
+        <el-button size="medium" class="configurationBtn">工单配置</el-button>
+      </el-row>
+      <!-- List -->
+      <el-table
+        :header-cell-style="{ 'border': 'none' ,'backgroundColor':'#f3f6fb', }"
+        :cell-style="{ 'border': 'none' ,'font-size': '16px'}"
+        :data="searchWork"
+        style="width: 100%"
+      >
+        <el-table-column
+          type="index"
+          label="序号"
+          width="80"
+        />
+        <el-table-column
+          prop="taskCode"
+          label="工单编号"
+        />
+        <el-table-column
+          prop="innerCode"
+          label="社备编号"
+        />
+        <el-table-column
+          prop="taskType.typeName"
+          label="工单类型"
+        />
+        <el-table-column
+          label="工单方式"
+        >
+          <template slot-scope="scope">
+            {{ createType[scope.row.createType] }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="工单状态"
+        >
+          <template slot-scope="scope">
+            {{ taskStatus[scope.row.taskStatus] }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="userName"
+          label="运营人员"
+        />
+        <el-table-column
+          label="创建日期"
+        >
+          <template slot-scope="scope">
+            {{ changeDateStr(scope.row.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          width="100"
+        >
+          <template slot-scope="scope">
+            <a href="#" class="view-details" @click="showDetail(scope.row.taskId)">查看详情</a>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 分页 -->
+      <MyPagination :total-page="totalPage" :total-count="totalCount" :page-index="pageIndex" @nextPage="changePage" @prePage="changePage" />
+    </div>
+    <!-- 新建弹出窗--新增工单 -->
+    <Newtask :replenishment-details="replenishmentDetails" :new-task="newTask" @showReplenishmentDetails="replenishmentDetails=true" @closeNewTask="newTask=false" />
+    <!-- 新建弹出窗--补货详情 -->
+    <el-dialog title="补货详情" :visible.sync="replenishmentDetails">
+      <el-table :header-cell-style="{'background-color': '#f3f6fb'}">
+        <el-table-column property="date" label="货道编号" width="150" />
+        <el-table-column property="name" label="商品名称" width="200" />
+        <el-table-column property="address" label="当前数量" />
+        <el-table-column property="address" label="还可添加" />
+        <el-table-column property="address" label="布满数量" />
+      </el-table>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
-import List from '@/components/List/List.vue'
+import { getWorkSearch } from '@/api'
+import * as dayjs from 'dayjs'
+import MyInput from '@/components/MyInput'
+import MyPagination from '@/components/MyPagination'
+import Newtask from './newTask.vue'
 export default {
   components: {
-    List
+    MyPagination,
+    MyInput,
+    Newtask
+  },
+  data() {
+    return {
+      inputArr: [
+        {
+          title: '工单编号',
+          placeholder: '请输入',
+          type: 'input',
+          value: ''
+        }, {
+          title: '工单状态',
+          placeholder: '请选择',
+          type: 'select',
+          value: '',
+          selectItem: [
+            {
+              lable: '待办中',
+              value: 1
+            },
+            {
+              lable: '进行中',
+              value: 2
+            },
+            {
+              lable: '已取消',
+              value: 3
+            },
+            {
+              lable: '已完成',
+              value: 4
+            }
+          ]
+        }
+      ],
+      searchWork: null,
+      taskStatus: {
+        1: '待办',
+        2: '进行',
+        3: '取消',
+        4: '完成'
+      },
+      createType: {
+        0: '自动',
+        1: '手动'
+      },
+      totalPage: '0',
+      totalCount: '0',
+      pageIndex: '0',
+      newTask: false,
+      replenishmentDetails: false
+    }
+  },
+  created() {
+    this.getWorkSearch(1)
+  },
+  methods: {
+    async getWorkSearch(pageIndex) {
+      const { data } = await getWorkSearch(pageIndex, this.inputArr[0].value, this.inputArr[1].value)
+      console.log(data)
+      this.totalPage = data.totalPage
+      this.totalCount = data.totalCount
+      this.pageIndex = data.pageIndex
+      // console.log(this.pageIndex)
+      this.searchWork = data.currentPageRecords
+    },
+    changeDateStr(dateStr) {
+      return dayjs(dateStr).format('YYYY.MM.DD hh:mm:ss')
+    },
+    changePage(page) {
+      this.getWorkSearch(page)
+    },
+    selectData() {
+      this.getWorkSearch(1)
+    }
   }
 }
 </script>
 
-<style>
+<style style lang="scss" scoped>
+.search{
+  display: flex;
+}
+.operation{
+  border-radius: 5px;
+  padding: 20px;
+  background-color: #fff;
+  .view-details{
+    color: blue;
+  }
+  .btn{
+    margin-bottom: 20px;
+    width: 100%;
+    height: 36px;
+    .newBtn{
+      font-size: 16px;
+      color: #fff;
+      background-image: linear-gradient(to bottom right, #ff913f, #ff6021);;
+    }
+    .configurationBtn{
+      padding: 10px 14px !important;
+      text-align: center;
+      font-size: 16px;
+      background-color: #fbf4f0;
+    }
+  }
+}
+.el-select {
+    width: 100%;
+}
 
 </style>
 
+<style>
+</style>
