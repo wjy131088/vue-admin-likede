@@ -1,5 +1,5 @@
 import axios from 'axios'
-// import { MessageBox, Message } from 'element-ui'
+import { Message } from 'element-ui'
 import store from '@/store'
 // import { getToken } from '@/utils/auth'
 
@@ -15,6 +15,17 @@ service.interceptors.request.use(function(config) {
   return config
 }, function(error) {
   // 对请求错误做些什么
+  return Promise.reject(error)
+})
+service.interceptors.response.use(function(response) {
+  // console.log(response)
+  return response
+}, function(error) {
+  Message({
+    message: error.response.data,
+    type: 'error',
+    duration: 5 * 1000
+  })
   return Promise.reject(error)
 })
 // request interceptor

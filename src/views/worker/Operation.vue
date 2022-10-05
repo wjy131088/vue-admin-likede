@@ -9,8 +9,8 @@
     <div class="operation">
       <!-- 按钮 -->
       <el-row class="btn">
-        <el-button size="medium" icon="el-icon-circle-plus-outline" class="newBtn" @click="newTask = true">新建</el-button>
-        <el-button size="medium" class="configurationBtn">工单配置</el-button>
+        <el-button size="medium" icon="el-icon-circle-plus-outline" class="newBtn" @click="newTask=true" @closeNewTask="closeNewTask">新建</el-button>
+        <el-button size="medium" class="configurationBtn" @click="supplyAlertValue">工单配置</el-button>
       </el-row>
       <!-- List -->
       <el-table
@@ -74,34 +74,40 @@
       <MyPagination :total-page="totalPage" :total-count="totalCount" :page-index="pageIndex" @nextPage="changePage" @prePage="changePage" />
     </div>
     <!-- 新建弹出窗--新增工单 -->
-    <Newtask :replenishment-details="replenishmentDetails" :new-task="newTask" @showReplenishmentDetails="replenishmentDetails=true" @closeNewTask="newTask=false" />
-    <!-- 新建弹出窗--补货详情 -->
-    <el-dialog title="补货详情" :visible.sync="replenishmentDetails">
-      <el-table :header-cell-style="{'background-color': '#f3f6fb'}">
-        <el-table-column property="date" label="货道编号" width="150" />
-        <el-table-column property="name" label="商品名称" width="200" />
-        <el-table-column property="address" label="当前数量" />
-        <el-table-column property="address" label="还可添加" />
-        <el-table-column property="address" label="布满数量" />
-      </el-table>
+    <Newtask :new-task="newTask" :cope-task="copeData" @closeNewTask="newTask=false;copeData={}" />
+    <!-- 查看详情 -->
+    <ViewDetials :task-id="selectTaskId" :view-detials="viewDetials" @closeViewDetials="closeViewDetials" @copeNewTask="copeNewTask" />
+    <!-- 工单配置 -->
+    <el-dialog title="工单配置" style=" font-weight: 700;" :visible.sync="supplyConfig">
+
+      <span style="margin-left:35px;">补货警戒线：</span>
+      <el-input-number v-model="alertValue" controls-position="right" class="input-number" />
+      <el-row class="btn" style="text-align: center;margin-top:25px;">
+        <el-button size="medium" class="configurationBtn" style="margin-right:15px;">取消</el-button>
+        <el-button size="medium" class="newBtn" @click="autoSupplyConfig">确认</el-button>
+      </el-row>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getWorkSearch } from '@/api'
+import { getWorkSearch, autoSupplyConfig, supplyAlertValue } from '@/api'
 import * as dayjs from 'dayjs'
 import MyInput from '@/components/MyInput'
 import MyPagination from '@/components/MyPagination'
 import Newtask from './newTask.vue'
+import ViewDetials from './ViewDetails.vue'
 export default {
   components: {
     MyPagination,
     MyInput,
-    Newtask
+    Newtask,
+    ViewDetials
   },
   data() {
     return {
+      copeData: {},
+      selectTaskId: '',
       inputArr: [
         {
           title: '工单编号',
@@ -148,7 +154,9 @@ export default {
       totalCount: '0',
       pageIndex: '0',
       newTask: false,
-      replenishmentDetails: false
+      viewDetials: false,
+      supplyConfig: false,
+      alertValue: 0
     }
   },
   created() {
@@ -161,7 +169,6 @@ export default {
       this.totalPage = data.totalPage
       this.totalCount = data.totalCount
       this.pageIndex = data.pageIndex
-      // console.log(this.pageIndex)
       this.searchWork = data.currentPageRecords
     },
     changeDateStr(dateStr) {
@@ -172,6 +179,34 @@ export default {
     },
     selectData() {
       this.getWorkSearch(1)
+    },
+    closeNewTask() {
+      this.newTask = false
+    },
+    showDetail(taskId) {
+      this.selectTaskId = taskId
+      this.viewDetials = true
+    },
+    closeViewDetials() {
+      this.viewDetials = false
+    },
+    copeNewTask(copeData) {
+      this.copeData = copeData
+      this.newTask = true
+    },
+    async supplyAlertValue() {
+      try {
+        this.supplyConfig = true
+        const { data } = await supplyAlertValue()
+        this.alertValue = data
+      } catch (e) {
+        console.log(e)
+      }
+      // console.log(this.alertValue)
+    },
+    async autoSupplyConfig() {
+      const data = await autoSupplyConfig(this.alertValue)
+      console.log(data)
     }
   }
 }
@@ -188,7 +223,12 @@ export default {
   .view-details{
     color: blue;
   }
-  .btn{
+
+}
+.el-select {
+    width: 100%;
+}
+.btn{
     margin-bottom: 20px;
     width: 100%;
     height: 36px;
@@ -204,11 +244,9 @@ export default {
       background-color: #fbf4f0;
     }
   }
-}
-.el-select {
-    width: 100%;
-}
-
+  .input-number{
+    width: 500px;
+  }
 </style>
 
 <style>

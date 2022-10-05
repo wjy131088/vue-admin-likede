@@ -6,83 +6,174 @@
       :visible.sync="newTask"
       width="630px"
       :close-on-click-modal="false"
-      :before-close="changeNewTask"
+      :before-close="closeNewTask"
     >
-      <el-form ref="form" :model="form" class="myDialog" :rules="rules">
+      <el-form ref="form" :model="taskData" class="myDialog" :rules="rules">
         <!-- 文本框 -->
-        <el-form-item label="设备编号：" prop="name" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off" placeholder="请输入" />
+        <el-form-item label="设备编号：" prop="innerCode" :label-width="formLabelWidth">
+          <el-input v-model="taskData.innerCode" autocomplete="off" placeholder="请输入" @input="getOperatorList" />
+        </el-form-item>
+        <!-- 下拉选择 -->
+        <el-form-item label="工单类型：" prop="productType" :label-width="formLabelWidth">
+          <el-select v-model="taskData.productType" placeholder="请选择">
+            <el-option label="补货工单" value="2" />
+          </el-select>
         </el-form-item>
         <!-- 补货数量 -->
         <el-form-item style="color:#6487ff;;" label="补货数量：" :label-width="formLabelWidth">
           <span class="el-icon-edit-outline" style="margin-right:5px;font-size:16px" />
-          <a style="font-size:15px" @click="changeReplenishmentDetails">补货清单</a>
-        <!-- <el-input v-model="form.name" prefix-icon="el-icon-edit-outline" autocomplete="off" /> -->
+          <a style="font-size:15px" @click="showReplenishmentDetails">补货清单</a>
         </el-form-item>
         <!-- 下拉选择 -->
-        <el-form-item label="工单类型：" :label-width="formLabelWidth">
-          <el-select v-model="form.region" placeholder="请选择">
-            <el-option label="补货工单" value="2" />
-          </el-select>
-        </el-form-item>
-        <!-- 下拉选择 -->
-        <el-form-item label="运营人员：" :label-width="formLabelWidth">
-          <el-select v-model="form.region" placeholder="请选择">
-            <el-option label="补货工单" value="2" />
+        <el-form-item label="运营人员：" :label-width="formLabelWidth" prop="userId">
+          <el-select v-model="taskData.userId" placeholder="请选择">
+            <el-option v-for="(item,index) in taskUser" :key="index" :label="item.userName" :value="item.userId" />
           </el-select>
         </el-form-item>
         <!-- 文本域 -->
-        <el-form-item label="备注：" :label-width="formLabelWidth">
-          <el-input v-model="form.name" type="textarea" autocomplete="off" />
+        <el-form-item label="备注：" :label-width="formLabelWidth" prop="desc">
+          <el-input v-model="taskData.desc" type="textarea" autocomplete="off" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">立即创建</el-button>
+          <el-button @click="resetForm">取消</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="changeNewTask">取 消</el-button>
-        <el-button type="primary" @click="changeNewTask">确 定</el-button>
-      </div>
+      <!-- <div slot="footer" class="dialog-footer">
+        <el-button @click="closeNewTask">取 消</el-button>
+        <el-button type="primary" @click="createTask">确 定</el-button>
+      </div> -->
     </el-dialog>
+    <!-- 新建弹出窗--补货详情 -->
+    <replenishmentDetails :channel-list="taskData.details" :replenishment-details="replenishmentDetails" @closeReplenishmentDetails="closeReplenishmentDetails" />
   </div>
 </template>
 
 <script>
+import replenishmentDetails from './replenishmentDetails.vue'
+import { getChannelList, getOperatorList, createTask } from '@/api'
+
 export default {
+  components: {
+    replenishmentDetails
+  },
   props: {
     newTask: {
       type: Boolean,
       default: false
     },
-    replenishmentDetails: {
-      type: Boolean,
-      default: false
+    copeTask: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
     return {
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+      taskData: {
+        createType: 1,
+        innerCode: '',
+        userId: '',
+        productType: '',
+        desc: '',
+        details: [],
+        region: ''
       },
+      taskUser: [],
       formLabelWidth: '100px',
       rules: {
-        name: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        innerCode: [
+          { required: true, message: '请输入', trigger: 'blur' }
+        ],
+        productType: [
+          { required: true, message: '请选择', trigger: 'change' }
+        ],
+        userId: [
+          { required: true, message: '请选择', trigger: 'change' }
+        ],
+        desc: [
+          { required: true, message: '请输入', trigger: 'blur' }
         ]
-      }
+      },
+      replenishmentDetails: false,
+      channelList: null
     }
   },
+  watch: {
+    copeTask: function(newTask, oldTask) {
+      if (JSON.stringify(newTask) !== '{}') {
+        this.taskData.createType = newTask.createType
+        this.taskData.innerCode = newTask.innerCode
+        this.taskData.userId = newTask.userId
+        this.taskData.productType = newTask.productTypeId + ''
+        this.taskData.desc = newTask.desc
+        this.taskData.details = newTask.details
+        this.taskData.region = newTask.region
+        this.getOperatorList()
+      } else {
+        this.taskData = {}
+      }
+    }
+
+  },
   methods: {
-    changeNewTask() {
+    closeNewTask() {
+      this.resetForm()
       this.$emit('closeNewTask')
     },
-    changeReplenishmentDetails() {
-      this.$emit('showReplenishmentDetails')
+    closeReplenishmentDetails() {
+      this.replenishmentDetails = false
+    },
+    async showReplenishmentDetails() {
+      if (this.taskData.innerCode) {
+        this.replenishmentDetails = true
+        const { data } = await getChannelList(this.taskData.innerCode)
+        this.taskData.details = data
+        this.taskData.details.forEach(item => {
+          item.need = item.skuId !== '0'
+          if (item.need) {
+            item.canAdd = item.maxCapacity - item.currentCapacity
+            if (item.canAdd < 0) {
+              item.canAdd = 0
+            }
+            item.expectCapacity = item.canAdd
+          }
+        })
+      } else {
+        this.taskData.details = []
+      }
+    },
+    async getOperatorList() {
+      if (this.taskData.innerCode) {
+        const data = await getOperatorList(this.taskData.innerCode)
+        this.taskUser = data.data
+      } else {
+        this.taskUser = []
+      }
+    },
+    async createTask() {
+      this.taskData.details = this.taskData.details.filter(item => item.need)
+      try {
+        await createTask(this.taskData)
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    submitForm() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          this.createTask()
+          this.resetForm()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm() {
+      console.log(this.copeTask)
+      this.$emit('closeNewTask')
+      this.$refs['form'].resetFields()
     }
   }
 }
